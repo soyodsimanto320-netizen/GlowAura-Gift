@@ -219,19 +219,171 @@ footer small{display:block;margin-top:18px;color:var(--mute)}
 </section>
 
 <!-- CUSTOMIZE -->
+
 <section class="alt" id="customize">
- <div class="wrap">
-  <h2 class="rv">Your Photo. Your Name. Your Memory.</h2>
-  <p class="lead rv">Personalizing your LED gift is simple. Everything happens on WhatsApp, with no forms or accounts.</p>
-  <ol class="steps">
-   <li class="rv"><h3>Choose your gift</h3><p>Pick a lamp or LED gift from our collection.</p></li>
-   <li class="rv"><h3>Send photo and names</h3><p>Message us your favourite photo and the names you want on it.</p></li>
-   <li class="rv"><h3>Confirm your design</h3><p>We prepare your design and confirm the details with you.</p></li>
-   <li class="rv"><h3>Receive your glow</h3><p>Your personalized keepsake is made and sent to you.</p></li>
-  </ol>
-  <div class="btns"><a class="btn gold wa" href="#" data-msg="Hello GlowAura! I want to customize a gift. I will send my photo and names.">Send Your Photo on WhatsApp</a></div>
- </div>
+  <div class="wrap">
+    <h2 class="rv">Create Your Own Glow</h2>
+    <p class="lead rv">Customize your personal LED photo lamp.</p>
+
+    <div class="ga-editor">
+      <div class="ga-preview">
+        <div class="ga-lamp" id="gaLamp">
+          <img id="gaPhoto" alt="Your uploaded photo"
+            style="display:none;width:100%;height:210px;object-fit:cover;border-radius:10px;">
+          <div id="gaPlaceholder">✨ Your Photo Here ✨</div>
+          <div id="gaNames">Your Names</div>
+        </div>
+        <p style="color:#C5A45A;text-align:center">
+          Live Preview
+        </p>
+      </div>
+
+      <div class="ga-controls">
+        <label>Your Names</label>
+        <input id="gaNameInput" type="text"
+          placeholder="Enter your names" maxlength="35">
+
+        <label>Upload Your Photo</label>
+        <input id="gaUpload" type="file" accept="image/*">
+
+        <label>Choose Lamp Colour</label>
+        <div class="ga-colors">
+          <button type="button" data-color="#ff4d8d" style="background:#ff4d8d"></button>
+          <button type="button" data-color="#35d07f" style="background:#35d07f"></button>
+          <button type="button" data-color="#3aa0ff" style="background:#3aa0ff"></button>
+          <button type="button" data-color="#a65bff" style="background:#a65bff"></button>
+          <button type="button" data-color="#ffe14d" style="background:#ffe14d"></button>
+          <button type="button" data-color="#ff9f1a" style="background:#ff9f1a"></button>
+        </div>
+
+        <a class="btn gold" id="gaOrder" href="#" target="_blank">
+          Order This Design on WhatsApp
+        </a>
+      </div>
+    </div>
+  </div>
 </section>
+
+<style>
+.ga-editor {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:30px;
+  margin-top:35px;
+  align-items:center;
+}
+.ga-preview {
+  padding:25px;
+  border:1px solid var(--line);
+  background:#181715;
+}
+.ga-lamp {
+  min-height:280px;
+  padding:20px;
+  border:3px solid var(--ga-color,#ff4d8d);
+  border-radius:15px;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:15px;
+  box-shadow:0 0 30px var(--ga-color,#ff4d8d);
+  transition:.4s;
+}
+#gaPlaceholder {
+  color:#C5A45A;
+  font-size:22px;
+}
+#gaNames {
+  color:#e3c981;
+  font-family:var(--serif);
+  font-size:30px;
+  overflow-wrap:anywhere;
+}
+.ga-controls {
+  display:flex;
+  flex-direction:column;
+  gap:13px;
+}
+.ga-controls label {
+  color:#e3c981;
+}
+.ga-controls input {
+  width:100%;
+  padding:14px;
+  background:#111;
+  color:white;
+  border:1px solid var(--gold);
+  border-radius:5px;
+}
+.ga-colors {
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+}
+.ga-colors button {
+  width:38px;
+  height:38px;
+  border:2px solid white;
+  border-radius:50%;
+  cursor:pointer;
+}
+@media(max-width:700px) {
+  .ga-editor {grid-template-columns:1fr;}
+}
+</style>
+
+<script>
+(function(){
+  const nameInput = document.getElementById("gaNameInput");
+  const names = document.getElementById("gaNames");
+  const upload = document.getElementById("gaUpload");
+  const photo = document.getElementById("gaPhoto");
+  const placeholder = document.getElementById("gaPlaceholder");
+  const lamp = document.getElementById("gaLamp");
+  const order = document.getElementById("gaOrder");
+
+  nameInput.addEventListener("input", function(){
+    names.textContent = this.value || "Your Names";
+  });
+
+  upload.addEventListener("change", function(){
+    const file = this.files && this.files[0];
+    if(!file) return;
+
+    if(!file.type.startsWith("image/")) {
+      alert("Please select an image.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e){
+      photo.src = e.target.result;
+      photo.style.display = "block";
+      placeholder.style.display = "none";
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.querySelectorAll(".ga-colors button").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      lamp.style.setProperty("--ga-color", this.dataset.color);
+    });
+  });
+
+  order.addEventListener("click", function(e){
+    e.preventDefault();
+    const message = "Hello GlowAura! I want to order a custom lamp. Names: "
+      + (nameInput.value || "Not provided")
+      + ". I have selected a photo and lamp colour on your website. Please contact me.";
+    window.open(
+      "https://wa.me/?text=" + encodeURIComponent(message),
+      "_blank"
+    );
+  });
+})();
+</script>
 
 <!-- WHY -->
 <section id="why">
