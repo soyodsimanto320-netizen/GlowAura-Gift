@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GlowAura — Every Memory Has a Glow</title>
+<meta name="description" content="Personalized acrylic LED photo lamps and decorative LED gifts in Bangladesh.">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#111111;--bg2:#181715;--gold:#C5A45A;--gold2:#e3c981;--cream:#F3EBDD;--mute:#a79f90;--line:rgba(197,164,90,.28);--c:#ff4d8d;
+--serif:"Cormorant Garamond",Georgia,"Times New Roman",serif;--sans:"Jost",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-behavior:smooth;scroll-padding-top:calc(72px + env(safe-area-inset-top,0px));-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--cream);font:300 17px/1.7 var(--sans);overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:60}
+h1,h2,h3{font-family:var(--serif);font-weight:500;line-height:1.1;margin:0;letter-spacing:.01em}
+a{color:inherit}
+img,svg{max-width:100%}
+:focus-visible{outline:2px solid var(--gold2);outline-offset:3px}
+.wrap{width:min(1120px,100% - 40px);margin-inline:auto}
+section{padding:88px 0}
+h2{font-size:clamp(2.1rem,6vw,3.4rem);color:var(--cream)}
+.lead{color:var(--mute);max-width:56ch;margin:14px 0 0}
+.rule{width:56px;height:1px;background:var(--gold);margin:22px 0}
+
+/* header */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:rgba(17,17,17,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;height:68px}
+.logo{font-family:var(--serif);font-size:1.7rem;text-decoration:none;color:var(--cream);letter-spacing:.04em}
+.logo b{color:var(--gold);font-weight:600}
+nav ul{display:flex;gap:28px;list-style:none;margin:0;padding:0}
+nav a{text-decoration:none;font-size:.9rem;letter-spacing:.06em;color:var(--cream);opacity:.85;transition:color .2s}
+nav a:hover{color:var(--gold2);opacity:1}
+.burger{display:none;background:none;border:1px solid var(--line);color:var(--gold);width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:1.2rem}
+@media(max-width:820px){
+ .burger{display:block}
+ nav{position:absolute;left:0;right:0;top:68px;background:var(--bg);border-bottom:1px solid var(--line);max-height:0;overflow:hidden;transition:max-height .35s ease}
+ nav.open{max-height:420px}
+ nav ul{flex-direction:column;gap:0;padding:8px 20px 18px}
+ nav a{display:block;padding:13px 0;font-size:1.05rem;border-bottom:1px solid rgba(197,164,90,.12)}
+}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 30px;border-radius:2px;font:500 .85rem/1 var(--sans);letter-spacing:.16em;text-decoration:none;text-transform:uppercase;border:1px solid var(--gold);cursor:pointer;transition:transform .2s,background .25s,color .25s,box-shadow .25s}
+.btn.gold{background:linear-gradient(135deg,var(--gold2),var(--gold) 55%,#a98a42);color:#16130c}
+.btn.gold:hover{box-shadow:0 8px 28px rgba(197,164,90,.35);transform:translateY(-2px)}
+.btn.line{background:transparent;color:var(--gold2)}
+.btn.line:hover{background:rgba(197,164,90,.12);transform:translateY(-2px)}
+.btn svg{width:18px;height:18px;fill:currentColor}
+.btns{display:flex;flex-wrap:wrap;gap:14px;margin-top:34px}
+@media(max-width:520px){.btns .btn{width:100%}}
+
+/* hero */
+.hero{padding:56px 0 80px;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;width:760px;height:760px;right:-200px;top:-120px;border-radius:50%;background:radial-gradient(circle,var(--c) 0%,transparent 62%);opacity:.16;transition:background .8s;pointer-events:none}
+.hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:40px;align-items:center;position:relative}
+.hero h1{font-size:clamp(3rem,10vw,6rem);font-weight:500}
+.hero h1 span{display:block;color:var(--gold2)}
+.hero p.sub{font-size:1.15rem;color:var(--cream);opacity:.88;max-width:34ch;margin:22px 0 0}
+.lampbox{display:flex;flex-direction:column;align-items:center}
+.lampbox svg{width:min(380px,86%);height:auto;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.hint{font-size:.82rem;color:var(--mute);margin-top:6px;text-align:center}
+@media(max-width:820px){.hero .wrap{grid-template-columns:1fr}.lampbox{order:-1}.hero{padding-top:28px}}
+.glowpulse{animation:pulse 4.5s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.72}}
+.intro > *{animation:rise .9s cubic-bezier(.2,.7,.2,1) both}
+.intro > *:nth-child(2){animation-delay:.12s}.intro > *:nth-child(3){animation-delay:.24s}.intro > *:nth-child(4){animation-delay:.36s}
+@keyframes rise{from{opacity:0;transform:translateY(22px)}}
+
+/* featured */
+.alt{background:var(--bg2);border-block:1px solid var(--line)}
+.feat{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.feat .pic{background:radial-gradient(circle at 50% 45%,rgba(197,164,90,.14),transparent 65%);border:1px solid var(--line);padding:24px;display:flex;justify-content:center}
+.feat .pic svg{width:min(320px,100%);height:auto}
+.feat ul{list-style:none;padding:0;margin:24px 0}
+.feat li{padding:11px 0 11px 30px;border-bottom:1px solid rgba(197,164,90,.15);position:relative}
+.feat li::before{content:"";position:absolute;left:4px;top:21px;width:9px;height:9px;background:var(--gold);transform:rotate(45deg)}
+.price{font-family:var(--serif);font-size:2.1rem;color:var(--gold2)}
+.price small{font:300 .85rem var(--sans);color:var(--mute);margin-left:8px}
+@media(max-width:820px){.feat{grid-template-columns:1fr;gap:30px}}
+
+/* products */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;margin-top:44px}
+.card{border:1px solid var(--line);padding:30px 26px;display:flex;flex-direction:column;background:linear-gradient(180deg,rgba(197,164,90,.05),transparent);transition:border-color .3s,transform .3s}
+.card:hover{border-color:var(--gold);transform:translateY(-4px)}
+.card h3{font-size:1.7rem;color:var(--gold2)}
+.card p{color:var(--mute);margin:12px 0 18px;flex:1}
+.card .pr{font-family:var(--serif);font-size:1.4rem;margin-bottom:16px}
+.card .btn{min-height:46px;padding:0 20px}
+
+/* customize */
+.steps{list-style:none;counter-reset:s;padding:0;margin:44px 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px}
+.steps li{counter-increment:s;border-top:1px solid var(--gold);padding-top:18px}
+.steps li::before{content:counter(s);font-family:var(--serif);font-size:2.4rem;color:var(--gold)}
+.steps h3{font-size:1.4rem;margin:2px 0 8px}
+.steps p{margin:0;color:var(--mute);font-size:.98rem}
+
+/* why */
+.why{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:0;margin-top:44px;border:1px solid var(--line)}
+.why div{padding:34px 26px;border:1px solid var(--line);margin:-1px 0 0 -1px}
+.why h3{font-size:1.5rem;color:var(--gold2);margin-bottom:8px}
+.why p{margin:0;color:var(--mute);font-size:.98rem}
+
+/* about + contact */
+.about{max-width:760px}
+.about p{font-size:1.2rem;color:var(--cream);opacity:.9}
+.contact{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
+.info{list-style:none;padding:0;margin:26px 0 0}
+.info li{padding:14px 0;border-bottom:1px solid rgba(197,164,90,.15);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.info span{color:var(--mute)}
+@media(max-width:820px){.contact{grid-template-columns:1fr;gap:28px}}
+footer{border-top:1px solid var(--line);text-align:center;padding:56px 0 40px}
+footer .msg{font-family:var(--serif);font-size:clamp(1.7rem,5vw,2.6rem);color:var(--gold2)}
+footer small{display:block;margin-top:18px;color:var(--mute)}
+
+.rv{opacity:0;transform:translateY(18px);transition:opacity .8s,transform .8s}
+.rv.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<header>
+ <div class="wrap bar">
+  <a class="logo" href="#home">Glow<b>Aura</b></a>
+  <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false">☰</button>
+  <nav id="nav"><ul>
+   <li><a href="#home">Home</a></li>
+   <li><a href="#products">Our Products</a></li>
+   <li><a href="#customize">Customize Your Gift</a></li>
+   <li><a href="#why">Why GlowAura</a></li>
+   <li><a href="#about">About Us</a></li>
+   <li><a href="#contact">Contact Us</a></li>
+  </ul></nav>
+ </div>
+</header>
+
+<main>
+<!-- HOME -->
+<section class="hero" id="home">
+ <div class="wrap">
+  <div class="intro">
+   <h1>Make Your Moments <span>Glow.</span></h1>
+   <p class="sub">Turn Your Favourite Memories Into Beautiful Glowing Keepsakes.</p>
+   <div class="btns">
+    <a class="btn gold" href="#products">Explore Collection</a>
+    <a class="btn line wa" href="#" data-msg="Hello GlowAura! I would like to place an order.">
+     <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.2c-.2.6-1.300 1.200-1.800 1.200-.5.100-1 .2-3.300-.7-2.800-1.100-4.600-4-4.700-4.200-.1-.2-1.100-1.500-1.100-2.800s.7-2 1-2.300c.2-.3.500-.3.700-.3h.5c.2 0 .4 0 .6.500l.8 2c.1.200.1.400 0 .5l-.3.500-.4.400c-.1.200-.3.300-.1.600.2.300.8 1.300 1.700 2.100 1.200 1 2.100 1.300 2.400 1.500.3.100.5.100.6-.1l.9-1.100c.2-.3.400-.2.600-.1l1.900.9c.3.100.5.200.5.300.1.200.1.800-.1 1.400Z"/></svg>
+     Order on WhatsApp</a>
+   </div>
+  </div>
+  <div class="lampbox">
+   <svg id="lamp" viewBox="0 0 400 480" role="img" aria-label="Glowing acrylic LED photo lamp. Tap to change colour.">
+    <defs>
+     <radialGradient id="halo" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="var(--c)" stop-opacity=".55"/><stop offset="1" stop-color="var(--c)" stop-opacity="0"/></radialGradient>
+     <linearGradient id="acr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset=".5" stop-color="#fff" stop-opacity=".05"/><stop offset="1" stop-color="#fff" stop-opacity=".16"/></linearGradient>
+     <linearGradient id="base" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b2822"/><stop offset="1" stop-color="#0d0d0c"/></linearGradient>
+    </defs>
+    <ellipse class="glowpulse" cx="200" cy="260" rx="200" ry="220" fill="url(#halo)"/>
+    <rect x="80" y="40" width="240" height="320" rx="14" fill="#1a1916" stroke="#C5A45A" stroke-opacity=".5"/>
+    <rect x="80" y="40" width="240" height="320" rx="14" fill="var(--c)" opacity=".16"/>
+    <!-- couple silhouette -->
+    <g fill="#F3EBDD" opacity=".92">
+     <circle cx="168" cy="152" r="21"/><path d="M128 262c0-34 18-60 40-60s40 26 40 60v28h-80z"/>
+     <circle cx="236" cy="158" r="19"/><path d="M200 262c0-30 15-52 36-52s36 22 36 52v28h-72z"/>
+    </g>
+    <path d="M200 108c-9-14-30-6-26 10 3 12 26 26 26 26s23-14 26-26c4-16-17-24-26-10z" fill="var(--c)"/>
+    <text x="200" y="330" text-anchor="middle" font-family="Cormorant Garamond,Georgia,serif" font-size="30" fill="#e3c981" font-style="italic">Your Names</text>
+    <rect x="80" y="40" width="240" height="320" rx="14" fill="url(#acr)"/>
+    <rect x="68" y="360" width="264" height="30" rx="8" fill="url(#base)" stroke="#C5A45A" stroke-opacity=".45"/>
+    <rect x="86" y="386" width="228" height="3" rx="2" fill="var(--c)"/>
+    <circle cx="200" cy="375" r="4" fill="var(--c)"/>
+    <ellipse cx="200" cy="396" rx="130" ry="9" fill="var(--c)" opacity=".28"/>
+   </svg>
+   <div class="hint">Tap the lamp to change the colour</div>
+  </div>
+ </div>
+</section>
+
+<!-- FEATURED -->
+<section class="alt" id="featured">
+ <div class="wrap feat">
+  <div class="pic rv">
+   <svg viewBox="0 0 400 480" role="img" aria-label="Personalized Couple Acrylic LED Photo Lamp" id="lamp2">
+    <ellipse cx="200" cy="260" rx="190" ry="210" fill="url(#halo)" opacity=".8"/>
+    <rect x="80" y="40" width="240" height="320" rx="14" fill="#1a1916" stroke="#C5A45A" stroke-opacity=".5"/>
+    <rect x="80" y="40" width="240" height="320" rx="14" fill="var(--c)" opacity=".16"/>
+    <g fill="#F3EBDD" opacity=".92"><circle cx="168" cy="152" r="21"/><path d="M128 262c0-34 18-60 40-60s40 26 40 60v28h-80z"/><circle cx="236" cy="158" r="19"/><path d="M200 262c0-30 15-52 36-52s36 22 36 52v28h-72z"/></g>
+    <path d="M200 108c-9-14-30-6-26 10 3 12 26 26 26 26s23-14 26-26c4-16-17-24-26-10z" fill="var(--c)"/>
+    <text x="200" y="330" text-anchor="middle" font-family="Cormorant Garamond,Georgia,serif" font-size="30" fill="#e3c981" font-style="italic">Your Names</text>
+    <rect x="80" y="40" width="240" height="320" rx="14" fill="url(#acr)"/>
+    <rect x="68" y="360" width="264" height="30" rx="8" fill="url(#base)" stroke="#C5A45A" stroke-opacity=".45"/>
+    <rect x="86" y="386" width="228" height="3" rx="2" fill="var(--c)"/>
+   </svg>
+  </div>
+  <div class="rv">
+   <h2>Personalized Couple Acrylic LED Photo Lamp</h2>
+   <ul>
+    <li>Custom Couple Photo</li>
+    <li>Personalized Names</li>
+    <li>RGB 7 Color Touch LED Base</li>
+    <li>Premium Acrylic Design</li>
+    <li>Perfect Personalized Gift</li>
+   </ul>
+   <div class="price" data-price>৳ ____ <small>Price coming soon</small></div>
+   <div class="btns"><a class="btn gold wa" href="#" data-msg="Hello GlowAura! I want to order the Personalized Couple Acrylic LED Photo Lamp.">Order on WhatsApp</a></div>
+  </div>
+ </div>
+</section>
+
+<!-- PRODUCTS -->
+<section id="products">
+ <div class="wrap">
+  <h2 class="rv">Our Products</h2>
+  <p class="lead rv">Personalized acrylic LED photo lamps and decorative LED gifts, made around your memories.</p>
+  <div class="grid" id="productGrid"></div>
+ </div>
+</section>
+
+<!-- CUSTOMIZE -->
+<section class="alt" id="customize">
+ <div class="wrap">
+  <h2 class="rv">Your Photo. Your Name. Your Memory.</h2>
+  <p class="lead rv">Personalizing your LED gift is simple. Everything happens on WhatsApp, with no forms or accounts.</p>
+  <ol class="steps">
+   <li class="rv"><h3>Choose your gift</h3><p>Pick a lamp or LED gift from our collection.</p></li>
+   <li class="rv"><h3>Send photo and names</h3><p>Message us your favourite photo and the names you want on it.</p></li>
+   <li class="rv"><h3>Confirm your design</h3><p>We prepare your design and confirm the details with you.</p></li>
+   <li class="rv"><h3>Receive your glow</h3><p>Your personalized keepsake is made and sent to you.</p></li>
+  </ol>
+  <div class="btns"><a class="btn gold wa" href="#" data-msg="Hello GlowAura! I want to customize a gift. I will send my photo and names.">Send Your Photo on WhatsApp</a></div>
+ </div>
+</section>
+
+<!-- WHY -->
+<section id="why">
+ <div class="wrap">
+  <h2 class="rv">Why Choose GlowAura</h2>
+  <div class="why">
+   <div class="rv"><h3>Personalized Designs</h3><p>Every piece is made around your own photo and story.</p></div>
+   <div class="rv"><h3>Creative Gift Ideas</h3><p>Thoughtful ideas for birthdays, anniversaries and every occasion.</p></div>
+   <div class="rv"><h3>Elegant LED Decoration</h3><p>Soft, warm lighting that turns a shelf or bedside into a feature.</p></div>
+   <div class="rv"><h3>Custom Photo and Name Options</h3><p>Choose the photo, the names and the look you love.</p></div>
+  </div>
+ </div>
+</section>
+
+<!-- ABOUT -->
+<section class="alt" id="about">
+ <div class="wrap about">
+  <h2 class="rv">About Us</h2><div class="rule"></div>
+  <p class="rv">GlowAura is a personalized gift brand focused on turning special memories into beautiful decorative pieces.</p>
+  <p class="rv">Our goal is to make every gift more meaningful through personalized designs and creative lighting.</p>
+ </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+ <div class="wrap contact">
+  <div class="rv">
+   <h2>Contact Us</h2>
+   <p class="lead">Message us to order, ask a question or start your custom design.</p>
+   <div class="btns">
+    <a class="btn gold wa" href="#" data-msg="Hello GlowAura! I have a question.">WhatsApp</a>
+    <a class="btn line" id="fb" href="#" target="_blank" rel="noopener">Facebook</a>
+   </div>
+  </div>
+  <ul class="info rv">
+   <li><span>WhatsApp</span><b id="cWa">—</b></li>
+   <li><span>Facebook</span><b id="cFb">—</b></li>
+   <li><span>Email</span><b id="cMail">—</b></li>
+   <li><span>Location</span><b id="cLoc">—</b></li>
+  </ul>
+ </div>
+</section>
+</main>
+
+<footer>
+ <div class="wrap">
+  <div class="msg">GlowAura — Every Memory Has a Glow.</div>
+  <small id="copy"></small>
+ </div>
+</footer>
+
+<script>
+/* ============================================================
+   EDIT HERE — GlowAura site settings (no other coding needed)
+   Change only the text between the quote marks, then save.
+   ============================================================ */
+var SETTINGS = {
+  whatsappNumber: "",   // Digits only, with country code. Example: 8801XXXXXXXXX (leave empty to let customers pick a chat)
+  facebookUrl:    "",   // Your Facebook page link. Example: https://www.facebook.com/yourpage
+  email:          "",   // Your email address (optional)
+  location:       "Bangladesh",
+  featuredPrice:  "",   // Example: "৳ 1,500"  (leave empty to show the placeholder)
+};
+
+var PRODUCTS = [   // Add, remove or rename products here. Leave price empty to show a placeholder.
+  { name: "Couple Acrylic LED Photo Lamp", text: "Your couple photo and names on premium acrylic with an RGB 7 colour touch base.", price: "" },
+  { name: "Custom Photo LED Lamp", text: "A personalized lamp for family, friends or any moment you want to keep glowing.", price: "" },
+  { name: "Decorative LED Gifts", text: "Creative LED gift ideas for every occasion. Message us to see what is available.", price: "" }
+];
+/* ============================ end of settings ============================ */
+
+(function(){
+  var S = SETTINGS, num = (S.whatsappNumber||"").replace(/\D/g,"");
+  function wa(msg){ return "https://wa.me/" + num + "?text=" + encodeURIComponent(msg); }
+  function bindWa(root){
+    (root||document).querySelectorAll("a.wa").forEach(function(a){
+      a.href = wa(a.getAttribute("data-msg")||"Hello GlowAura!");
+      a.target = "_blank"; a.rel = "noopener";
+    });
+  }
+  var pg = document.getElementById("productGrid");
+  PRODUCTS.forEach(function(p){
+    var d = document.createElement("div"); d.className = "card rv";
+    var h = document.createElement("h3"); h.textContent = p.name;
+    var t = document.createElement("p"); t.textContent = p.text;
+    var pr = document.createElement("div"); pr.className = "pr"; pr.textContent = p.price || "৳ ____";
+    var b = document.createElement("a"); b.className = "btn line wa"; b.textContent = "Order on WhatsApp";
+    b.setAttribute("data-msg", "Hello GlowAura! I am interested in: " + p.name);
+    d.append(h,t,pr,b); pg.appendChild(d);
+  });
+  bindWa();
+
+  var fb = document.getElementById("fb");
+  if (S.facebookUrl){ fb.href = S.facebookUrl; } else { fb.href = "https://www.facebook.com/"; }
+  var priceEl = document.querySelector("[data-price]");
+  if (S.featuredPrice) priceEl.textContent = S.featuredPrice;
+  document.getElementById("cWa").textContent = num ? "+" + num : "Add your number in settings";
+  document.getElementById("cFb").textContent = S.facebookUrl || "Add your page link in settings";
+  var m = document.getElementById("cMail");
+  if (S.email){ var ml = document.createElement("a"); ml.href = "mailto:" + S.email; ml.textContent = S.email; m.textContent = ""; m.appendChild(ml); } else m.textContent = "Add your email in settings";
+  document.getElementById("cLoc").textContent = S.location || "—";
+  document.getElementById("copy").textContent = "© " + new Date().getFullYear() + " GlowAura";
+
+  // mobile menu
+  var nav = document.getElementById("nav"), bg = document.getElementById("burger");
+  bg.addEventListener("click", function(){ var o = nav.classList.toggle("open"); bg.setAttribute("aria-expanded", o); });
+  nav.addEventListener("click", function(e){ if (e.target.tagName === "A"){ nav.classList.remove("open"); bg.setAttribute("aria-expanded","false"); } });
+
+  // lamp colour: 7 touch colours
+  var cols = ["#ff4d8d","#ff3b30","#ff9f1a","#ffe14d","#35d07f","#3aa0ff","#a65bff"], i = 0, root = document.documentElement;
+  function setC(){ root.style.setProperty("--c", cols[i]); }
+  document.getElementById("lamp").addEventListener("click", function(){ i = (i+1) % cols.length; setC(); });
+  setInterval(function(){ i = (i+1) % cols.length; setC(); }, 4500);
+
+  // reveal on scroll
+  var els = document.querySelectorAll(".rv");
+  if ("IntersectionObserver" in window){
+    var io = new IntersectionObserver(function(en){ en.forEach(function(e){ if (e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } }); }, {threshold:.12});
+    els.forEach(function(el){ io.observe(el); });
+  } else els.forEach(function(el){ el.classList.add("in"); });
+})();
+</script>
+</body>
+</html>
