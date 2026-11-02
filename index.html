@@ -487,14 +487,43 @@ var PRODUCTS = [
   }
   var pg = document.getElementById("productGrid");
   PRODUCTS.forEach(function(p){
-    var d = document.createElement("div"); d.className = "card rv";
-    var h = document.createElement("h3"); h.textContent = p.name;
-    var t = document.createElement("p"); t.textContent = p.text;
-    var pr = document.createElement("div"); pr.className = "pr"; pr.textContent = p.price || "৳ ____";
-    var b = document.createElement("a"); b.className = "btn line wa"; b.textContent = "Order on WhatsApp";
-    b.setAttribute("data-msg", "Hello GlowAura! I am interested in: " + p.name);
-    d.append(h,t,pr,b); pg.appendChild(d);
- });
+
+  var d = document.createElement("div");
+  d.className = "card rv";
+
+  var img = document.createElement("img");
+  img.src = "https://raw.githubusercontent.com/soyodsimanto320-netizen/GlowAura-Gift/main/" + p.image;
+  img.alt = p.name;
+  img.style.width = "100%";
+  img.style.height = "220px";
+  img.style.objectFit = "contain";
+
+  img.onerror = function(){
+    this.alt = "Image not found: " + p.image;
+  };
+
+  var h = document.createElement("h3");
+  h.textContent = p.name;
+
+  var t = document.createElement("p");
+  t.textContent = p.text;
+
+  var pr = document.createElement("div");
+  pr.className = "pr";
+  pr.textContent = "৳ " + p.price;
+
+  var b = document.createElement("a");
+  b.className = "btn line wa";
+  b.textContent = "Order on WhatsApp";
+
+  b.setAttribute("data-msg",
+    "Hello GlowAura! I am interested in: " + p.name
+  );
+
+  d.append(img,h,t,pr,b);
+  pg.appendChild(d);
+
+});
   bindWa();
 
   var fb = document.getElementById("fb");
