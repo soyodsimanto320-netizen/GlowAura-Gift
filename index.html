@@ -81,13 +81,34 @@ nav a:hover{color:var(--gold2);opacity:1}
 @media(max-width:820px){.feat{grid-template-columns:1fr;gap:30px}}
 
 /* products */
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;margin-top:44px}
-.card{border:1px solid var(--line);padding:30px 26px;display:flex;flex-direction:column;background:linear-gradient(180deg,rgba(197,164,90,.05),transparent);transition:border-color .3s,transform .3s}
+.grid{display:flex;gap:18px;margin-top:44px;overflow-x:auto;overflow-y:hidden;padding:4px 2px 18px;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
+.grid::-webkit-scrollbar{height:6px}.grid::-webkit-scrollbar-thumb{background:var(--gold);border-radius:8px}
+.card{flex:0 0 clamp(230px,29vw,280px);scroll-snap-align:start;border:1px solid var(--line);padding:20px 18px;display:flex;flex-direction:column;background:linear-gradient(180deg,rgba(197,164,90,.07),transparent);transition:border-color .3s,transform .3s;cursor:pointer}
 .card:hover{border-color:var(--gold);transform:translateY(-4px)}
-.card h3{font-size:1.7rem;color:var(--gold2)}
-.card p{color:var(--mute);margin:12px 0 18px;flex:1}
-.card .pr{font-family:var(--serif);font-size:1.4rem;margin-bottom:16px}
-.card .btn{min-height:46px;padding:0 20px}
+.card h3{font-size:1.45rem;color:var(--gold2);margin-top:14px}
+.card p{color:var(--mute);margin:10px 0 14px;flex:1;font-size:.95rem}
+.card img{border:1px solid rgba(197,164,90,.18);background:#0b0b0b}
+.card .pr{font-family:var(--serif);font-size:1.55rem;color:var(--gold2);margin-bottom:14px}
+.card .regular{font:400 .9rem var(--sans);color:var(--mute);text-decoration:line-through;margin-right:9px}
+.card .offer-tag{font:500 .7rem var(--sans);color:#17130a;background:var(--gold2);padding:3px 7px;letter-spacing:.05em}
+.card .btn{min-height:46px;padding:0 16px}
+@media(max-width:520px){.card{flex-basis:76vw}} 
+
+/* Product details popup */
+.product-modal{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;padding:18px}
+.product-modal.open{display:flex}
+.product-modal-box{width:min(560px,100%);max-height:90vh;overflow:auto;background:#181715;border:1px solid var(--gold);padding:22px;position:relative;box-shadow:0 20px 70px #000}
+.product-modal-close{position:absolute;right:12px;top:10px;border:1px solid var(--line);background:#111;color:var(--gold2);font-size:1.5rem;width:38px;height:38px;cursor:pointer}
+.product-modal-box h3{color:var(--gold2);font-size:2rem;padding-right:38px}
+.product-modal-box p{color:var(--mute)}
+.product-modal-image{width:100%;height:250px;object-fit:contain;background:#0b0b0b;border:1px solid var(--line);margin:12px 0}
+.variant-title{color:var(--gold2);margin:14px 0 8px;font-size:.95rem}
+.variant-list{display:flex;flex-wrap:wrap;gap:9px}
+.variant-choice{border:1px solid var(--line);background:#111;color:var(--cream);padding:9px 13px;cursor:pointer}
+.variant-choice.selected{border-color:var(--gold2);background:rgba(197,164,90,.18);color:var(--gold2)}
+.modal-price{margin:14px 0;font-family:var(--serif);font-size:1.8rem;color:var(--gold2)}
+.modal-price del{font:400 .95rem var(--sans);color:var(--mute);margin-right:10px}
+
 
 /* customize */
 .steps{list-style:none;counter-reset:s;padding:0;margin:44px 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px}
@@ -214,9 +235,24 @@ footer small{display:block;margin-top:18px;color:var(--mute)}
  <div class="wrap">
   <h2 class="rv">Our Products</h2>
   <p class="lead rv">Personalized acrylic LED photo lamps and decorative LED gifts, made around your memories.</p>
-  <div class="grid" id="productGrid"></div>
+  <div class="grid" id="productGrid" aria-label="Swipe to browse products"></div>
+  <p class="hint" style="margin-top:8px">← Swipe to explore more products →</p>
  </div>
 </section>
+
+<!-- PRODUCT DETAILS POPUP -->
+<div class="product-modal" id="productModal" role="dialog" aria-modal="true" aria-labelledby="modalProductName">
+  <div class="product-modal-box">
+    <button class="product-modal-close" id="closeProductModal" aria-label="Close">×</button>
+    <h3 id="modalProductName"></h3>
+    <img class="product-modal-image" id="modalProductImage" alt="">
+    <p id="modalProductText"></p>
+    <div class="variant-title">Choose design / colour</div>
+    <div class="variant-list" id="modalVariants"></div>
+    <div class="modal-price" id="modalProductPrice"></div>
+    <a class="btn gold" id="modalOrder" href="#" target="_blank" rel="noopener">Order selected design on WhatsApp</a>
+  </div>
+</div>
 
 <!-- CUSTOMIZE -->
 
@@ -452,45 +488,59 @@ var PRODUCTS = [
   {
     name: "Couple Acrylic LED Photo Lamp",
     text: "Beautiful Couple LED Photo Lamp.",
+    regularPrice: "999",
     price: "799",
-    image: "couple-led-lamp.png"
+    image: "couple-led-lamp.png",
+    variants: ["Couple Photo", "Heart Design", "Name Design"]
   },
   {
     name: "Galaxy Projector",
     text: "Beautiful Galaxy Lighting.",
+    regularPrice: "999",
     price: "780",
-    image: "galaxy-projector.png"
+    image: "galaxy-projector.png",
+    variants: ["Galaxy Blue", "Galaxy Purple", "Mixed Colours"]
   },
   {
     name: "Glow Lamp",
     text: "Premium Decorative Glow Lamp.",
+    regularPrice: "899",
     price: "699",
-    image: "glow-lamp.png"
+    image: "glow-lamp.png",
+    variants: ["Warm White", "RGB"]
   },
   {
     name: "LED Moon Lamp",
     text: "Beautiful LED Moon Decoration.",
+    regularPrice: "1099",
     price: "899",
-    image: "led-moon-lamp.png"
+    image: "led-moon-lamp.png",
+    variants: ["Warm White", "Multi Colour"]
   },
- {
-  name: "Water Ripple Atmosphere Lamp",
-  text: "Beautiful Ocean Wave Projection for Bedroom & Gaming Room.",
-  price: "999",
-  image: "water-ripple-lamp.png"
-},
-{
-  name: "Wooden Bedside Table Lamp",
-  text: "Elegant Warm Light Lamp for Bedroom, Study & Home Decoration.",
-  price: "899",
-  image: "wooden-bedside-lamp.png"
-},
-{
-  name: "Acrylic 3D LED Night Lamp",
-  text: "Beautiful 3D Acrylic LED Lamp with Multiple Attractive Designs. Perfect for Gifts.",
-  price: "699",
-  image: "custom-acrylic-3d-led-lamp.png"
-},
+  {
+    name: "Water Ripple Atmosphere Lamp",
+    text: "Beautiful Ocean Wave Projection for Bedroom & Gaming Room.",
+    regularPrice: "1299",
+    price: "999",
+    image: "water-ripple-lamp.png",
+    variants: ["Ocean Blue", "Purple Wave", "Mixed Colours"]
+  },
+  {
+    name: "Wooden Bedside Table Lamp",
+    text: "Elegant Warm Light Lamp for Bedroom, Study & Home Decoration.",
+    regularPrice: "1199",
+    price: "899",
+    image: "wooden-bedside-lamp.png",
+    variants: ["Natural Wood", "Warm Light"]
+  },
+  {
+    name: "Acrylic 3D LED Night Lamp",
+    text: "Beautiful 3D Acrylic LED Lamp with Multiple Attractive Designs. Perfect for Gifts.",
+    regularPrice: "999",
+    price: "699",
+    image: "custom-acrylic-3d-led-lamp.png",
+    variants: ["I Love You Heart", "Finger Heart", "Deer", "Teddy Bear", "Heart Balloon", "Sports Car"]
+  }
 ];
 /* ============================ end of settings ============================ */
 
@@ -504,45 +554,88 @@ var PRODUCTS = [
     });
   }
   var pg = document.getElementById("productGrid");
+  var modal = document.getElementById("productModal");
+  var selectedProduct = null, selectedVariant = "";
+  function openProduct(p){
+    selectedProduct = p;
+    selectedVariant = (p.variants && p.variants[0]) || "Standard";
+    document.getElementById("modalProductName").textContent = p.name;
+    document.getElementById("modalProductText").textContent = p.text;
+    var modalImg = document.getElementById("modalProductImage");
+    modalImg.src = "https://raw.githubusercontent.com/soyodsimanto320-netizen/GlowAura-Gift/main/" + p.image;
+    modalImg.alt = p.name;
+    document.getElementById("modalProductPrice").innerHTML =
+      (p.regularPrice ? '<del>৳ ' + p.regularPrice + '</del>' : '') + '৳ ' + p.price;
+    var list = document.getElementById("modalVariants");
+    list.innerHTML = "";
+    (p.variants && p.variants.length ? p.variants : ["Standard"]).forEach(function(v, idx){
+      var choice = document.createElement("button");
+      choice.type = "button";
+      choice.className = "variant-choice" + (idx===0 ? " selected" : "");
+      choice.textContent = v;
+      choice.addEventListener("click", function(){
+        selectedVariant = v;
+        list.querySelectorAll(".variant-choice").forEach(function(x){x.classList.remove("selected");});
+        choice.classList.add("selected");
+      });
+      list.appendChild(choice);
+    });
+    modal.classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+  function closeProduct(){
+    modal.classList.remove("open");
+    document.body.style.overflow = "";
+  }
+  document.getElementById("closeProductModal").addEventListener("click", closeProduct);
+  modal.addEventListener("click", function(e){ if(e.target===modal) closeProduct(); });
+  document.addEventListener("keydown", function(e){ if(e.key==="Escape") closeProduct(); });
+  document.getElementById("modalOrder").addEventListener("click", function(e){
+    e.preventDefault();
+    if(!selectedProduct) return;
+    var message = "Hello GlowAura! I want to order: " + selectedProduct.name +
+      ". Selected design/colour: " + selectedVariant +
+      ". Offer price: ৳ " + selectedProduct.price + ". Please confirm availability.";
+    window.open(wa(message), "_blank", "noopener");
+  });
+
   PRODUCTS.forEach(function(p){
+    var d = document.createElement("div");
+    d.className = "card rv";
+    d.tabIndex = 0;
+    d.setAttribute("role","button");
+    d.setAttribute("aria-label","View " + p.name);
 
-  var d = document.createElement("div");
-  d.className = "card rv";
+    var img = document.createElement("img");
+    img.src = "https://raw.githubusercontent.com/soyodsimanto320-netizen/GlowAura-Gift/main/" + p.image;
+    img.alt = p.name;
+    img.style.width = "100%";
+    img.style.height = "190px";
+    img.style.objectFit = "contain";
+    img.onerror = function(){ this.alt = "Image not found: " + p.image; };
 
-  var img = document.createElement("img");
-  img.src = "https://raw.githubusercontent.com/soyodsimanto320-netizen/GlowAura-Gift/main/" + p.image;
-  img.alt = p.name;
-  img.style.width = "100%";
-  img.style.height = "220px";
-  img.style.objectFit = "contain";
+    var h = document.createElement("h3");
+    h.textContent = p.name;
+    var t = document.createElement("p");
+    t.textContent = p.text;
 
-  img.onerror = function(){
-    this.alt = "Image not found: " + p.image;
-  };
+    var pr = document.createElement("div");
+    pr.className = "pr";
+    pr.innerHTML = (p.regularPrice ? '<span class="regular">৳ ' + p.regularPrice + '</span>' : '') +
+      '<span>৳ ' + p.price + '</span>' +
+      (p.regularPrice ? ' <span class="offer-tag">OFFER</span>' : '');
 
-  var h = document.createElement("h3");
-  h.textContent = p.name;
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn line";
+    b.textContent = "View Designs";
+    b.addEventListener("click", function(){ openProduct(p); });
+    d.addEventListener("click", function(e){ if(e.target!==b) openProduct(p); });
+    d.addEventListener("keydown", function(e){ if(e.key==="Enter" || e.key===" "){e.preventDefault();openProduct(p);} });
+    d.append(img,h,t,pr,b);
+    pg.appendChild(d);
+  });
 
-  var t = document.createElement("p");
-  t.textContent = p.text;
-
-  var pr = document.createElement("div");
-  pr.className = "pr";
-  pr.textContent = "৳ " + p.price;
-
-  var b = document.createElement("a");
-  b.className = "btn line wa";
-  b.textContent = "Order on WhatsApp";
-
-  b.setAttribute("data-msg",
-    "Hello GlowAura! I am interested in: " + p.name
-  );
-
-  d.append(img,h,t,pr,b);
-  pg.appendChild(d);
-
-});
-  bindWa();
 
   var fb = document.getElementById("fb");
   if (S.facebookUrl){ fb.href = S.facebookUrl; } else { fb.href = "https://www.facebook.com/"; }
