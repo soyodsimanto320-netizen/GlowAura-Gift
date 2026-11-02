@@ -85,6 +85,15 @@ nav a:hover{color:var(--gold2);opacity:1}
 .grid::-webkit-scrollbar{height:6px}.grid::-webkit-scrollbar-thumb{background:var(--gold);border-radius:8px}
 .card{flex:0 0 clamp(230px,29vw,280px);scroll-snap-align:start;border:1px solid var(--line);padding:20px 18px;display:flex;flex-direction:column;background:linear-gradient(180deg,rgba(197,164,90,.07),transparent);transition:border-color .3s,transform .3s;cursor:pointer}
 .card:hover{border-color:var(--gold);transform:translateY(-4px)}
+.card{position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent}
+.card::after{content:"";position:absolute;inset:-60%;pointer-events:none;opacity:0;background:linear-gradient(115deg,transparent 42%,rgba(227,201,129,.28) 50%,transparent 58%);transform:translateX(-65%) rotate(12deg)}
+.card.tap-glow{animation:cardTapGlow .72s ease}
+.card.tap-glow::after{opacity:1;animation:goldSweep .8s ease forwards}
+.card.tap-glow img{animation:productPop .65s cubic-bezier(.2,.9,.25,1.3)}
+@keyframes cardTapGlow{0%{transform:scale(1);box-shadow:0 0 0 rgba(227,201,129,0)}35%{transform:scale(.975);border-color:var(--gold2);box-shadow:0 0 34px rgba(197,164,90,.48)}100%{transform:scale(1);box-shadow:0 0 0 rgba(227,201,129,0)}}
+@keyframes goldSweep{to{transform:translateX(65%) rotate(12deg);opacity:0}}
+@keyframes productPop{0%{transform:scale(.92);filter:brightness(1)}55%{transform:scale(1.06);filter:brightness(1.45)}100%{transform:scale(1);filter:brightness(1)}}
+
 .card h3{font-size:1.45rem;color:var(--gold2);margin-top:14px}
 .card p{color:var(--mute);margin:10px 0 14px;flex:1;font-size:.95rem}
 .card img{border:1px solid rgba(197,164,90,.18);background:#0b0b0b}
@@ -96,7 +105,10 @@ nav a:hover{color:var(--gold2);opacity:1}
 
 /* Product details popup */
 .product-modal{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;padding:18px}
-.product-modal.open{display:flex}
+.product-modal.open{display:flex;animation:modalFade .28s ease both}
+.product-modal.open .product-modal-box{animation:modalUnfold .58s cubic-bezier(.18,.85,.25,1.2) both}
+@keyframes modalFade{from{opacity:0}to{opacity:1}}
+@keyframes modalUnfold{0%{opacity:0;transform:perspective(900px) rotateX(18deg) scale(.82) translateY(35px);filter:blur(8px)}65%{opacity:1;transform:perspective(900px) rotateX(-3deg) scale(1.02) translateY(-3px);filter:blur(0)}100%{transform:perspective(900px) rotateX(0) scale(1) translateY(0)}}
 .product-modal-box{width:min(560px,100%);max-height:90vh;overflow:auto;background:#181715;border:1px solid var(--gold);padding:22px;position:relative;box-shadow:0 20px 70px #000}
 .product-modal-close{position:absolute;right:12px;top:10px;border:1px solid var(--line);background:#111;color:var(--gold2);font-size:1.5rem;width:38px;height:38px;cursor:pointer}
 .product-modal-box h3{color:var(--gold2);font-size:2rem;padding-right:38px}
@@ -138,9 +150,25 @@ footer small{display:block;margin-top:18px;color:var(--mute)}
 .rv{opacity:0;transform:translateY(18px);transition:opacity .8s,transform .8s}
 .rv.in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}.rv{opacity:1;transform:none}}
+
+/* GlowAura ambient premium motion */
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.13;background:radial-gradient(circle at 12% 22%,rgba(227,201,129,.22),transparent 28%),radial-gradient(circle at 88% 72%,rgba(197,164,90,.18),transparent 30%);animation:ambientDrift 13s ease-in-out infinite alternate}
+@keyframes ambientDrift{from{transform:translate3d(-2%,0,0) scale(1)}to{transform:translate3d(2%,-1%,0) scale(1.08)}}
+#goldParticles{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:2;opacity:.58}
+header,.hero,.wrap,footer,.product-modal{position:relative}
+header,.product-modal{z-index:50}
+section,.hero,footer{isolation:isolate}
+.btn{position:relative;overflow:hidden}
+.btn::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent,rgba(255,255,255,.3),transparent);transform:translateX(-130%);transition:transform .65s ease}
+.btn:active::after,.btn:hover::after{transform:translateX(130%)}
+.rv.in{animation:sectionSpark .75s ease both}
+@keyframes sectionSpark{0%{filter:brightness(.75);transform:translateY(18px)}65%{filter:brightness(1.12);transform:translateY(-2px)}100%{filter:brightness(1);transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){body::after,#goldParticles{display:none}.rv.in{animation:none}}
+
 </style>
 </head>
 <body>
+<canvas id="goldParticles" aria-hidden="true"></canvas>
 
 <header>
  <div class="wrap bar">
@@ -557,6 +585,15 @@ var PRODUCTS = [
   var modal = document.getElementById("productModal");
   var selectedProduct = null, selectedVariant = "";
   function openProduct(p){
+    var card = Array.prototype.find.call(pg.children, function(el){
+      return el.getAttribute("aria-label") === "View " + p.name;
+    });
+    if(card){
+      card.classList.remove("tap-glow");
+      void card.offsetWidth;
+      card.classList.add("tap-glow");
+      setTimeout(function(){ card.classList.remove("tap-glow"); }, 900);
+    }
     selectedProduct = p;
     selectedVariant = (p.variants && p.variants[0]) || "Standard";
     document.getElementById("modalProductName").textContent = p.name;
@@ -580,6 +617,8 @@ var PRODUCTS = [
       });
       list.appendChild(choice);
     });
+    modal.classList.remove("open");
+    void modal.offsetWidth; // restart popup animation on every open
     modal.classList.add("open");
     document.body.style.overflow = "hidden";
   }
@@ -662,10 +701,48 @@ var PRODUCTS = [
   // reveal on scroll
   var els = document.querySelectorAll(".rv");
   if ("IntersectionObserver" in window){
-    var io = new IntersectionObserver(function(en){ en.forEach(function(e){ if (e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } }); }, {threshold:.12});
+    var io = new IntersectionObserver(function(en){ en.forEach(function(e){ if (e.isIntersecting){ e.target.classList.add("in"); } else { e.target.classList.remove("in"); } }); }, {threshold:.12});
     els.forEach(function(el){ io.observe(el); });
   } else els.forEach(function(el){ el.classList.add("in"); });
 })();
 </script>
+
+<script>
+(function(){
+  if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var canvas=document.getElementById("goldParticles");
+  if(!canvas) return;
+  var ctx=canvas.getContext("2d");
+  if(!ctx) return;
+  var w=0,h=0,dpr=1,parts=[];
+  function resize(){
+    dpr=Math.min(window.devicePixelRatio||1,1.5);
+    w=window.innerWidth;h=window.innerHeight;
+    canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);
+    canvas.style.width=w+"px";canvas.style.height=h+"px";
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    parts=Array.from({length:Math.min(48,Math.max(18,Math.floor(w/12)))}).map(function(){
+      return {x:Math.random()*w,y:Math.random()*h,r:.5+Math.random()*1.5,
+        vx:(Math.random()-.5)*.22,vy:-.12-Math.random()*.28,a:.2+Math.random()*.55,
+        phase:Math.random()*6.28};
+    });
+  }
+  function draw(t){
+    ctx.clearRect(0,0,w,h);
+    parts.forEach(function(p){
+      p.x+=p.vx;p.y+=p.vy;p.phase+=.018;
+      if(p.y<-5){p.y=h+5;p.x=Math.random()*w;}
+      if(p.x<-5)p.x=w+5;if(p.x>w+5)p.x=-5;
+      var alpha=p.a*(.55+.45*Math.sin(p.phase+t*.0004));
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle="rgba(227,201,129,"+alpha+")";ctx.shadowColor="#C5A45A";ctx.shadowBlur=8;ctx.fill();
+    });
+    ctx.shadowBlur=0;
+    requestAnimationFrame(draw);
+  }
+  resize();window.addEventListener("resize",resize,{passive:true});requestAnimationFrame(draw);
+})();
+</script>
+
 </body>
 </html>
