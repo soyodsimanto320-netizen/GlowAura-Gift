@@ -171,6 +171,35 @@ section,.hero,footer{isolation:isolate}
 @keyframes sectionSpark{0%{filter:brightness(.75);transform:translateY(18px)}65%{filter:brightness(1.12);transform:translateY(-2px)}100%{filter:brightness(1);transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){body::after,#goldParticles{display:none}.rv.in{animation:none}}
 
+
+/* GlowAura order experience */
+.order-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.order-actions .btn{flex:1;min-width:170px}
+.btn.whatsapp{background:#168c55;border-color:#168c55;color:#fff}
+.order-modal{position:fixed;inset:0;z-index:150;background:rgba(0,0,0,.84);display:none;align-items:center;justify-content:center;padding:14px}
+.order-modal.open{display:flex;animation:modalFade .25s ease both}
+.order-box{width:min(560px,100%);max-height:88dvh;overflow:auto;background:#181715;border:1px solid var(--gold);border-radius:14px;padding:22px;box-shadow:0 20px 80px #000;animation:modalUnfold .45s ease both}
+.order-box h2{font-size:2rem;color:var(--gold2);margin:0 42px 8px 0}
+.order-box .subline{color:var(--mute);margin:0 0 18px}
+.order-close{float:right;background:#111;border:1px solid var(--line);color:var(--gold2);font-size:25px;width:38px;height:38px}
+.order-field{margin:13px 0}
+.order-field label{display:flex;align-items:center;gap:9px;color:var(--gold2);font-size:.92rem;margin-bottom:7px}
+.order-field input,.order-field textarea,.order-field select{width:100%;background:#101010;color:var(--cream);border:1px solid var(--line);border-radius:7px;padding:14px;font:400 16px var(--sans);outline:none;transition:border .2s,box-shadow .2s}
+.order-field input:focus,.order-field textarea:focus,.order-field select:focus{border-color:var(--gold2);box-shadow:0 0 0 3px rgba(197,164,90,.13)}
+.order-field textarea{min-height:88px;resize:vertical}
+.order-submit{width:100%;margin-top:12px}
+.order-note{font-size:.82rem;color:var(--mute);text-align:center}
+.order-success{display:none;text-align:center;padding:24px 8px}
+.order-success.show{display:block;animation:rise .5s ease both}
+.success-mark{width:70px;height:70px;border-radius:50%;border:2px solid var(--gold2);color:var(--gold2);display:grid;place-items:center;font-size:36px;margin:0 auto 16px;animation:successPop .55s cubic-bezier(.2,.9,.25,1.3) both}
+@keyframes successPop{from{transform:scale(.2) rotate(-45deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+.admin-panel{max-width:1000px;margin:30px auto;padding:20px;background:#181715;border:1px solid var(--line);border-radius:12px}
+.admin-panel input{background:#111;color:white;border:1px solid var(--line);padding:12px;margin:6px;border-radius:6px;max-width:100%}
+.admin-table{width:100%;border-collapse:collapse;font-size:.88rem;overflow:auto}
+.admin-table th,.admin-table td{padding:10px;border-bottom:1px solid var(--line);text-align:left}
+.admin-table select{background:#111;color:var(--cream);padding:8px;border:1px solid var(--gold)}
+@media(max-width:520px){.order-box{padding:16px}.order-actions{flex-direction:column}.order-actions .btn{width:100%}.admin-panel{padding:10px;overflow:auto}}
+
 </style>
 </head>
 <body>
@@ -284,7 +313,7 @@ section,.hero,footer{isolation:isolate}
     <div class="variant-title">Choose design / colour</div>
     <div class="variant-list" id="modalVariants"></div>
     <div class="modal-price" id="modalProductPrice"></div>
-    <a class="btn gold" id="modalOrder" href="#" target="_blank" rel="noopener">Order selected design on WhatsApp</a>
+    <div class="order-actions"><button class="btn gold" id="modalOrder" type="button">✦ Order Now</button><a class="btn whatsapp" id="modalWhatsApp" href="#" target="_blank" rel="noopener">☏ Order on WhatsApp</a></div>
   </div>
 </div>
 
@@ -447,8 +476,9 @@ section,.hero,footer{isolation:isolate}
     const message = "Hello GlowAura! I want to order a custom lamp. Names: "
       + (nameInput.value || "Not provided")
       + ". I have selected a photo and lamp colour on your website. Please contact me.";
+    const number = (window.SETTINGS && SETTINGS.whatsappNumber || "").replace(/\\D/g, "");
     window.open(
-      "https://wa.me/?text=" + encodeURIComponent(message),
+      "https://wa.me/" + number + "?text=" + encodeURIComponent(message),
       "_blank"
     );
   });
@@ -498,6 +528,29 @@ section,.hero,footer{isolation:isolate}
 </section>
 </main>
 
+
+<div class="order-modal" id="orderModal" role="dialog" aria-modal="true" aria-labelledby="orderHeading">
+ <div class="order-box">
+  <button class="order-close" id="orderClose" aria-label="Close">×</button>
+  <div id="orderFormWrap">
+   <h2 id="orderHeading">Complete Your Order</h2>
+   <p class="subline">GlowAura · Every Memory Has a Glow</p>
+   <form id="customerOrderForm">
+    <div class="order-field"><label for="oName">♙ Customer Name</label><input id="oName" name="customer_name" placeholder="Enter your full name" maxlength="100" required></div>
+    <div class="order-field"><label for="oMobile">☎ Mobile Number</label><input id="oMobile" name="mobile" inputmode="tel" placeholder="01XXXXXXXXX" pattern="01[3-9][0-9]{8}" maxlength="11" required></div>
+    <div class="order-field"><label for="oDistrict">⌖ Delivery District</label><select id="oDistrict" name="district" required><option value="">Select your district</option></select></div>
+    <div class="order-field"><label for="oAddress">⌂ Full Delivery Address</label><textarea id="oAddress" name="address" placeholder="House, road, area, upazila" maxlength="500" required></textarea></div>
+    <div class="order-field"><label for="oProduct">▣ Product</label><input id="oProduct" readonly required></div>
+    <div class="order-field"><label for="oDesign">✧ Design / Colour</label><input id="oDesign" readonly required></div>
+    <div class="order-field"><label for="oQty">▤ Quantity</label><input id="oQty" type="number" min="1" max="20" value="1" required></div>
+    <p class="order-note">Your order details will be sent securely to GlowAura.</p>
+    <button class="btn gold order-submit" id="submitOrder" type="submit">CONFIRM ORDER ✦</button>
+   </form>
+  </div>
+  <div class="order-success" id="orderSuccess"><div class="success-mark">✓</div><h2>Order Received!</h2><p>Your unique Order ID:</p><h2 id="successOrderId"></h2><p class="subline">GlowAura will contact you to confirm your order.</p><button type="button" class="btn line" id="successDone">Done</button></div>
+ </div>
+</div>
+
 <footer>
  <div class="wrap">
   <div class="msg">GlowAura — Every Memory Has a Glow.</div>
@@ -505,6 +558,7 @@ section,.hero,footer{isolation:isolate}
  </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ============================================================
    EDIT HERE — GlowAura site settings (no other coding needed)
@@ -517,6 +571,10 @@ var SETTINGS = {
   location:       "Bangladesh",
   featuredPrice:  "899",   // Example: "৳ 1,500"  (leave empty to show the placeholder)
 };
+
+// Supabase public browser configuration. Never put a Secret/service_role key here.
+var SUPABASE_URL = "https://cfnjsvqggcyugambwayy.supabase.co";
+var SUPABASE_PUBLISHABLE_KEY = "sb_publishable_nF55j4wyGXG-YOMkiS-3qQ_bEJiFIKo";
 
 var PRODUCTS = [
   {
@@ -587,6 +645,7 @@ var PRODUCTS = [
       a.target = "_blank"; a.rel = "noopener";
     });
   }
+  bindWa(document);
   var pg = document.getElementById("productGrid");
   var modal = document.getElementById("productModal");
   var selectedProduct = null, selectedVariant = "";
@@ -601,6 +660,7 @@ var PRODUCTS = [
       setTimeout(function(){ card.classList.remove("tap-glow"); }, 900);
     }
     selectedProduct = p;
+    window.__glowSelectedProduct = p;
     selectedVariant = (p.variants && p.variants[0]) || "Standard";
     document.getElementById("modalProductName").textContent = p.name;
     document.getElementById("modalProductText").textContent = p.text;
@@ -635,13 +695,24 @@ var PRODUCTS = [
   document.getElementById("closeProductModal").addEventListener("click", closeProduct);
   modal.addEventListener("click", function(e){ if(e.target===modal) closeProduct(); });
   document.addEventListener("keydown", function(e){ if(e.key==="Escape") closeProduct(); });
-  document.getElementById("modalOrder").addEventListener("click", function(e){
-    e.preventDefault();
+  var orderModal = document.getElementById("orderModal");
+  function openOrderForm(){
     if(!selectedProduct) return;
-    var message = "Hello GlowAura! I want to order: " + selectedProduct.name +
-      ". Selected design/colour: " + selectedVariant +
-      ". Offer price: ৳ " + selectedProduct.price + ". Please confirm availability.";
-    window.open(wa(message), "_blank", "noopener");
+    document.getElementById("oProduct").value=selectedProduct.name;
+    document.getElementById("oDesign").value=selectedVariant;
+    document.getElementById("orderFormWrap").style.display="block";
+    document.getElementById("orderSuccess").classList.remove("show");
+    orderModal.classList.add("open");
+  }
+  function closeOrderForm(){orderModal.classList.remove("open");}
+  document.getElementById("modalOrder").addEventListener("click",openOrderForm);
+  document.getElementById("orderClose").addEventListener("click",closeOrderForm);
+  document.getElementById("successDone").addEventListener("click",closeOrderForm);
+  orderModal.addEventListener("click",function(e){if(e.target===orderModal)closeOrderForm();});
+  document.getElementById("modalWhatsApp").addEventListener("click",function(e){
+    if(!selectedProduct)return;
+    var message="Hello GlowAura! I want to order: "+selectedProduct.name+". Design/colour: "+selectedVariant+". Price: ৳ "+selectedProduct.price+". Please confirm availability.";
+    this.href=wa(message);
   });
 
   PRODUCTS.forEach(function(p){
@@ -747,6 +818,39 @@ var PRODUCTS = [
     requestAnimationFrame(draw);
   }
   resize();window.addEventListener("resize",resize,{passive:true});requestAnimationFrame(draw);
+})();
+</script>
+
+
+<script>
+(function(){
+ const districts=["Bagerhat","Bandarban","Barguna","Barishal","Bhola","Bogura","Brahmanbaria","Chandpur","Chattogram","Chuadanga","Cox's Bazar","Cumilla","Dhaka","Dinajpur","Faridpur","Feni","Gaibandha","Gazipur","Gopalganj","Habiganj","Jamalpur","Jashore","Jhalokati","Jhenaidah","Joypurhat","Khagrachhari","Khulna","Kishoreganj","Kurigram","Kushtia","Lakshmipur","Lalmonirhat","Madaripur","Magura","Manikganj","Meherpur","Moulvibazar","Munshiganj","Mymensingh","Naogaon","Narail","Narayanganj","Narsingdi","Natore","Netrokona","Nilphamari","Noakhali","Pabna","Panchagarh","Patuakhali","Pirojpur","Rajbari","Rajshahi","Rangamati","Rangpur","Satkhira","Shariatpur","Sherpur","Sirajganj","Sunamganj","Sylhet","Tangail","Thakurgaon"];
+ const ds=document.getElementById('oDistrict'); districts.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d;ds.appendChild(o)});
+ const form=document.getElementById('customerOrderForm');
+ const supa=(window.supabase&&window.supabase.createClient)?window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY):null;
+ form.addEventListener('submit',async function(e){
+  e.preventDefault();
+  const btn=document.getElementById('submitOrder');btn.disabled=true;btn.textContent='SENDING ORDER…';
+  try{
+   if(!supa)throw new Error('Connection library did not load. Please refresh and try again.');
+   const orderId='GA-'+new Date().toISOString().slice(0,10).replace(/-/g,'')+'-'+crypto.randomUUID().slice(0,6).toUpperCase();
+   const p=window.__glowSelectedProduct||null;
+   const price=(p && p.price) ? Number(p.price) : 0;
+   const payload={order_id:orderId,customer_name:document.getElementById('oName').value.trim(),mobile:document.getElementById('oMobile').value.trim(),district:ds.value,address:document.getElementById('oAddress').value.trim(),product_name:document.getElementById('oProduct').value,design:document.getElementById('oDesign').value,quantity:Number(document.getElementById('oQty').value),unit_price:price,status:'Pending'};
+   const {error}=await supa.from('glow_orders').insert(payload);
+   if(error)throw error;
+   document.getElementById('orderFormWrap').style.display='none';document.getElementById('successOrderId').textContent=orderId;document.getElementById('orderSuccess').classList.add('show');form.reset();
+  }catch(err){alert('Order could not be submitted: '+(err.message||'Please try again.'));}
+  finally{btn.disabled=false;btn.textContent='CONFIRM ORDER ✦';}
+ });
+ // Lightweight admin page: open this same site with ?admin=1
+ if(new URLSearchParams(location.search).get('admin')==='1'){
+  document.querySelector('main').innerHTML='<section><div class="wrap"><h2>GlowAura Admin</h2><p class="lead">Private order management</p><div class="admin-panel" id="adminPanel"><div id="adminLogin"><h3>Admin Login</h3><input id="adminEmail" type="email" placeholder="Admin email"><input id="adminPassword" type="password" placeholder="Password"><button class="btn gold" id="adminSignIn">Sign In</button><p id="adminMessage" class="order-note"></p></div><div id="adminOrders" style="display:none"><button class="btn line" id="adminRefresh">Refresh Orders</button> <button class="btn line" id="adminSignOut">Sign Out</button><div id="adminTableWrap"></div></div></div></div></section>';
+  document.getElementById('adminSignIn').onclick=async()=>{const msg=document.getElementById('adminMessage');if(!supa){msg.textContent='Database connection is unavailable. Refresh and try again.';return;}msg.textContent='Signing in…';const {data,error}=await supa.auth.signInWithPassword({email:document.getElementById('adminEmail').value,password:document.getElementById('adminPassword').value});if(error){msg.textContent=error.message;return;}const {data:allowed,error:checkError}=await supa.from('glow_admins').select('user_id').eq('user_id',data.user.id).maybeSingle();if(checkError||!allowed){await supa.auth.signOut();msg.textContent='This account is not an authorized admin.';return;}document.getElementById('adminLogin').style.display='none';document.getElementById('adminOrders').style.display='block';loadOrders();};
+  async function loadOrders(){const box=document.getElementById('adminTableWrap');box.textContent='Loading…';const {data,error}=await supa.from('glow_orders').select('*').order('created_at',{ascending:false});if(error){box.textContent='Could not load orders: '+error.message;return;}if(!data.length){box.textContent='No orders yet.';return;}let html='<table class="admin-table"><thead><tr><th>Order</th><th>Customer</th><th>Mobile</th><th>Product</th><th>Qty</th><th>Status</th></tr></thead><tbody>';data.forEach(o=>{html+='<tr><td>'+esc(o.order_id)+'</td><td>'+esc(o.customer_name)+'<br>'+esc(o.district)+'</td><td>'+esc(o.mobile)+'</td><td>'+esc(o.product_name)+'<br>'+esc(o.design||'')+'</td><td>'+esc(o.quantity)+'</td><td><select data-id="'+esc(o.id)+'"><option '+(o.status==='Pending'?'selected':'')+'>Pending</option><option '+(o.status==='Confirmed'?'selected':'')+'>Confirmed</option><option '+(o.status==='Processing'?'selected':'')+'>Processing</option><option '+(o.status==='Delivered'?'selected':'')+'>Delivered</option></select></td></tr>';});html+='</tbody></table>';box.innerHTML=html;box.querySelectorAll('select').forEach(sel=>sel.onchange=async()=>{const {error}=await supa.from('glow_orders').update({status:sel.value}).eq('id',sel.dataset.id);if(error){alert('Status update failed: '+error.message);loadOrders();}});}
+  function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  document.getElementById('adminRefresh').onclick=loadOrders;document.getElementById('adminSignOut').onclick=async()=>{await supa.auth.signOut();location.reload();};
+ }
 })();
 </script>
 
