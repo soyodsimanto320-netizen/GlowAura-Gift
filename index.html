@@ -196,7 +196,7 @@ section,.hero,footer{isolation:isolate}
 .admin-panel{max-width:1000px;margin:30px auto;padding:20px;background:#181715;border:1px solid var(--line);border-radius:12px}
 .admin-panel input{background:#111;color:white;border:1px solid var(--line);padding:12px;margin:6px;border-radius:6px;max-width:100%}
 .admin-table{width:100%;border-collapse:collapse;font-size:.88rem;overflow:auto}
-.admin-table th,.admin-table td{padding:10px;border-bottom:1px solid var(--line);text-align:left}
+.admin-table th,.admin-table td{padding:10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}.admin-table td.address-cell{min-width:220px;max-width:340px;white-space:normal;overflow-wrap:anywhere;line-height:1.55}.admin-table td.customer-cell{min-width:130px;white-space:normal;overflow-wrap:anywhere}.admin-table td{white-space:normal}
 .admin-table select{background:#111;color:var(--cream);padding:8px;border:1px solid var(--gold)}
 @media(max-width:520px){.order-box{padding:16px}.order-actions{flex-direction:column}.order-actions .btn{width:100%}.admin-panel{padding:10px;overflow:auto}}
 
@@ -543,6 +543,11 @@ section,.hero,footer{isolation:isolate}
     <div class="order-field"><label for="oProduct">▣ Product</label><input id="oProduct" readonly required></div>
     <div class="order-field"><label for="oDesign">✧ Design / Colour</label><input id="oDesign" readonly required></div>
     <div class="order-field"><label for="oQty">▤ Quantity</label><input id="oQty" type="number" min="1" max="20" value="1" required></div>
+    <div class="order-fee-box" style="border:1px solid var(--line);border-radius:9px;padding:13px;margin:14px 0;background:#111">
+     <p style="display:flex;justify-content:space-between;gap:12px;margin:5px 0;color:var(--cream)"><span>Delivery Charge</span><strong id="oDeliveryFee" style="color:var(--gold2)">৳150</strong></p>
+     <p style="display:flex;justify-content:space-between;gap:12px;margin:5px 0;color:var(--cream)"><span>Total Amount (including delivery)</span><strong id="oGrandTotal" style="color:var(--gold2)">৳150</strong></p>
+     <p class="order-note" style="margin:8px 0 0">Tangail: ৳70 · Other districts: ৳150</p>
+    </div>
     <p class="order-note">Your order details will be sent securely to GlowAura.</p>
     <button class="btn gold order-submit" id="submitOrder" type="submit">CONFIRM ORDER ✦</button>
    </form>
@@ -826,6 +831,17 @@ var PRODUCTS = [
 (function(){
  const districts=["Bagerhat","Bandarban","Barguna","Barishal","Bhola","Bogura","Brahmanbaria","Chandpur","Chattogram","Chuadanga","Cox's Bazar","Cumilla","Dhaka","Dinajpur","Faridpur","Feni","Gaibandha","Gazipur","Gopalganj","Habiganj","Jamalpur","Jashore","Jhalokati","Jhenaidah","Joypurhat","Khagrachhari","Khulna","Kishoreganj","Kurigram","Kushtia","Lakshmipur","Lalmonirhat","Madaripur","Magura","Manikganj","Meherpur","Moulvibazar","Munshiganj","Mymensingh","Naogaon","Narail","Narayanganj","Narsingdi","Natore","Netrokona","Nilphamari","Noakhali","Pabna","Panchagarh","Patuakhali","Pirojpur","Rajbari","Rajshahi","Rangamati","Rangpur","Satkhira","Shariatpur","Sherpur","Sirajganj","Sunamganj","Sylhet","Tangail","Thakurgaon"];
  const ds=document.getElementById('oDistrict'); districts.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d;ds.appendChild(o)});
+ const deliveryFee=()=>ds.value==='Tangail'?70:150;
+ function updateOrderTotals(){
+  const fee=deliveryFee();
+  const product=window.__glowSelectedProduct||null;
+  const unit=(product&&product.price)?Number(product.price):0;
+  const qty=Math.max(1,Number(document.getElementById('oQty').value)||1);
+  document.getElementById('oDeliveryFee').textContent='৳'+fee;
+  document.getElementById('oGrandTotal').textContent='৳'+(unit*qty+fee);
+ }
+ ds.addEventListener('change',updateOrderTotals);
+ document.getElementById('oQty').addEventListener('input',updateOrderTotals);
  const form=document.getElementById('customerOrderForm');
  const supa=(window.supabase&&window.supabase.createClient)?window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY):null;
  form.addEventListener('submit',async function(e){
@@ -847,7 +863,7 @@ var PRODUCTS = [
  if(new URLSearchParams(location.search).get('admin')==='1'){
   document.querySelector('main').innerHTML='<section><div class="wrap"><h2>GlowAura Admin</h2><p class="lead">Private order management</p><div class="admin-panel" id="adminPanel"><div id="adminLogin"><h3>Admin Login</h3><input id="adminEmail" type="email" placeholder="Admin email"><input id="adminPassword" type="password" placeholder="Password"><button class="btn gold" id="adminSignIn">Sign In</button><p id="adminMessage" class="order-note"></p></div><div id="adminOrders" style="display:none"><button class="btn line" id="adminRefresh">Refresh Orders</button> <button class="btn line" id="adminSignOut">Sign Out</button><div id="adminTableWrap"></div></div></div></div></section>';
   document.getElementById('adminSignIn').onclick=async()=>{const msg=document.getElementById('adminMessage');if(!supa){msg.textContent='Database connection is unavailable. Refresh and try again.';return;}msg.textContent='Signing in…';const {data,error}=await supa.auth.signInWithPassword({email:document.getElementById('adminEmail').value,password:document.getElementById('adminPassword').value});if(error){msg.textContent=error.message;return;}const {data:allowed,error:checkError}=await supa.from('glow_admins').select('user_id').eq('user_id',data.user.id).maybeSingle();if(checkError||!allowed){await supa.auth.signOut();msg.textContent='This account is not an authorized admin.';return;}document.getElementById('adminLogin').style.display='none';document.getElementById('adminOrders').style.display='block';loadOrders();};
-  async function loadOrders(){const box=document.getElementById('adminTableWrap');box.textContent='Loading…';const {data,error}=await supa.from('glow_orders').select('*').order('created_at',{ascending:false});if(error){box.textContent='Could not load orders: '+error.message;return;}if(!data.length){box.textContent='No orders yet.';return;}let html='<table class="admin-table"><thead><tr><th>Order</th><th>Customer</th><th>Mobile</th><th>Product</th><th>Qty</th><th>Status</th></tr></thead><tbody>';data.forEach(o=>{html+='<tr><td>'+esc(o.order_id)+'</td><td>'+esc(o.customer_name)+'<br>'+esc(o.district)+'</td><td>'+esc(o.mobile)+'</td><td>'+esc(o.product_name)+'<br>'+esc(o.design||'')+'</td><td>'+esc(o.quantity)+'</td><td><select data-id="'+esc(o.id)+'"><option '+(o.status==='Pending'?'selected':'')+'>Pending</option><option '+(o.status==='Confirmed'?'selected':'')+'>Confirmed</option><option '+(o.status==='Processing'?'selected':'')+'>Processing</option><option '+(o.status==='Delivered'?'selected':'')+'>Delivered</option></select></td></tr>';});html+='</tbody></table>';box.innerHTML=html;box.querySelectorAll('select').forEach(sel=>sel.onchange=async()=>{const {error}=await supa.from('glow_orders').update({status:sel.value}).eq('id',sel.dataset.id);if(error){alert('Status update failed: '+error.message);loadOrders();}});}
+  async function loadOrders(){const box=document.getElementById('adminTableWrap');box.textContent='Loading…';const {data,error}=await supa.from('glow_orders').select('*').order('created_at',{ascending:false});if(error){box.textContent='Could not load orders: '+error.message;return;}if(!data.length){box.textContent='No orders yet.';return;}let html='<div style="overflow-x:auto;width:100%"><table class="admin-table"><thead><tr><th>Order</th><th>Customer</th><th>Mobile</th><th>Delivery District</th><th>Full Delivery Address</th><th>Delivery Charge</th><th>Product</th><th>Qty</th><th>Status</th></tr></thead><tbody>';data.forEach(o=>{const fee=o.district==='Tangail'?70:150;html+='<tr><td>'+esc(o.order_id)+'</td><td class="customer-cell">'+esc(o.customer_name)+'</td><td>'+esc(o.mobile)+'</td><td>'+esc(o.district)+'</td><td class="address-cell">'+esc(o.address)+'</td><td>৳'+fee+'</td><td>'+esc(o.product_name)+'<br>'+esc(o.design||'')+'</td><td>'+esc(o.quantity)+'</td><td><select data-id="'+esc(o.id)+'"><option '+(o.status==='Pending'?'selected':'')+'>Pending</option><option '+(o.status==='Confirmed'?'selected':'')+'>Confirmed</option><option '+(o.status==='Processing'?'selected':'')+'>Processing</option><option '+(o.status==='Delivered'?'selected':'')+'>Delivered</option></select></td></tr>';});html+='</tbody></table></div>';box.innerHTML=html;box.querySelectorAll('select').forEach(sel=>sel.onchange=async()=>{const {error}=await supa.from('glow_orders').update({status:sel.value}).eq('id',sel.dataset.id);if(error){alert('Status update failed: '+error.message);loadOrders();}});}
   function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
   document.getElementById('adminRefresh').onclick=loadOrders;document.getElementById('adminSignOut').onclick=async()=>{await supa.auth.signOut();location.reload();};
  }
