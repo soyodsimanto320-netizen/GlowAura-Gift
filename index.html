@@ -124,12 +124,6 @@ nav a:hover{color:var(--gold2);opacity:1}
 .variant-list{display:flex;flex-wrap:wrap;gap:9px}
 .variant-choice{border:1px solid var(--line);background:#111;color:var(--cream);padding:9px 13px;cursor:pointer}
 .variant-choice.selected{border-color:var(--gold2);background:rgba(197,164,90,.18);color:var(--gold2)}
-.variant-choice{display:flex;align-items:center;gap:9px;border-radius:8px;min-height:64px;text-align:left;transition:transform .2s,border-color .2s,background .2s}
-.variant-choice:active{transform:scale(.97)}
-.variant-choice img{width:46px;height:46px;object-fit:cover;border-radius:6px;border:1px solid var(--line);background:#080808}
-.variant-choice span{font-size:.9rem}
-.variant-hint{font-size:.82rem;color:var(--mute);margin:4px 0 10px}
-
 .modal-price{margin:14px 0;font-family:var(--serif);font-size:1.8rem;color:var(--gold2)}
 .modal-price del{font:400 .95rem var(--sans);color:var(--mute);margin-right:10px}
 
@@ -316,8 +310,7 @@ section,.hero,footer{isolation:isolate}
     <h3 id="modalProductName"></h3>
     <img class="product-modal-image" id="modalProductImage" alt="">
     <p id="modalProductText"></p>
-    <div class="variant-title">Choose your flower design</div>
-    <p class="variant-hint">Select one of the 4 available designs. All variants have the same price.</p>
+    <div class="variant-title">Choose design / colour</div>
     <div class="variant-list" id="modalVariants"></div>
     <div class="modal-price" id="modalProductPrice"></div>
     <div class="order-actions"><button class="btn gold" id="modalOrder" type="button">✦ Order Now</button><a class="btn whatsapp" id="modalWhatsApp" href="#" target="_blank" rel="noopener">☏ Order on WhatsApp</a></div>
@@ -589,21 +582,38 @@ var SUPABASE_URL = "https://cfnjsvqggcyugambwayy.supabase.co";
 var SUPABASE_PUBLISHABLE_KEY = "sb_publishable_nF55j4wyGXG-YOMkiS-3qQ_bEJiFIKo";
 
 var PRODUCTS = [
- {
-    name: "Flower Lighting Bottle",
-    text: "A charming floral bottle light for your room, desk or a thoughtful gift. Choose your favourite flower design.",
-    price: "350",
-    image: "assets/flower-lighting-bottle/pink-blossom.png",
-    variants: [
-      { name: "Sunflower Glow", image: "assets/flower-lighting-bottle/sunflower-glow.png" },
-      { name: "Golden Bloom", image: "assets/flower-lighting-bottle/golden-bloom.png" },
-      { name: "Enchanted Garden", image: "assets/flower-lighting-bottle/enchanted-garden.png" },
-      { name: "Yellow Daisy", image: "assets/flower-lighting-bottle/yellow-daisy.png" }
-    ]
+  {
+    name: "PANDA Toy",
+    text: "Children's small shaking and screaming panda toy.",
+    regularPrice: "1199",
+    price: "999",
+    image: "Panda-Shaking&Screaming.png",
+    variants: ["White", "Black", "Purple"]
+  },
+  {
+    name: "Winter Snow Lamp",
+    text: "Decorative winter snow night light, perfect for gifts.",
+    regularPrice: "1099",
+    price: "899",
+    image: "Winter-Light-lamp.png"
+  },
+  {
+    name: "LED Table Lamp",
+    text: "Crystal-style creative touch table lamp for bedroom decor.",
+    regularPrice: "1680",
+    price: "1200",
+    image: "LED-Projection-Lamp.png"
+  },
+  {
+    name: "LED Table/Wall Lamp",
+    text: "Solar-powered outdoor wall light with waterproof design.",
+    regularPrice: "999",
+    price: "799",
+    image: "Crystal-LED-Table-Lamp.png"
   },
   {
     name: "Couple Acrylic LED Photo Lamp",
-    text: "Beautiful Couple LED Photo Lamp.",
+    text: "Beautiful personalized couple LED photo lamp.",
     regularPrice: "999",
     price: "799",
     image: "couple-led-lamp.png",
@@ -611,7 +621,7 @@ var PRODUCTS = [
   },
   {
     name: "Galaxy Projector",
-    text: "Beautiful Galaxy Lighting.",
+    text: "Beautiful galaxy lighting for your room.",
     regularPrice: "999",
     price: "780",
     image: "galaxy-projector.png",
@@ -619,7 +629,7 @@ var PRODUCTS = [
   },
   {
     name: "Glow Lamp",
-    text: "Premium Decorative Glow Lamp.",
+    text: "Premium decorative glow lamp.",
     regularPrice: "899",
     price: "699",
     image: "glow-lamp.png",
@@ -627,7 +637,7 @@ var PRODUCTS = [
   },
   {
     name: "LED Moon Lamp",
-    text: "Beautiful LED Moon Decoration.",
+    text: "Beautiful LED moon decoration.",
     regularPrice: "1099",
     price: "899",
     image: "led-moon-lamp.png",
@@ -635,7 +645,7 @@ var PRODUCTS = [
   },
   {
     name: "Water Ripple Atmosphere Lamp",
-    text: "Beautiful Ocean Wave Projection for Bedroom & Gaming Room.",
+    text: "Ocean-wave projection lamp for bedrooms and gaming rooms.",
     regularPrice: "1299",
     price: "999",
     image: "water-ripple-lamp.png",
@@ -643,7 +653,7 @@ var PRODUCTS = [
   },
   {
     name: "Wooden Bedside Table Lamp",
-    text: "Elegant Warm Light Lamp for Bedroom, Study & Home Decoration.",
+    text: "Elegant warm-light lamp for bedrooms, study and home decoration.",
     regularPrice: "1199",
     price: "899",
     image: "wooden-bedside-lamp.png",
@@ -651,7 +661,7 @@ var PRODUCTS = [
   },
   {
     name: "Acrylic 3D LED Night Lamp",
-    text: "Beautiful 3D Acrylic LED Lamp with Multiple Attractive Designs. Perfect for Gifts.",
+    text: "Beautiful 3D acrylic LED lamp with multiple attractive designs.",
     regularPrice: "999",
     price: "699",
     image: "custom-acrylic-3d-led-lamp.png",
@@ -672,10 +682,6 @@ var PRODUCTS = [
   bindWa(document);
   var pg = document.getElementById("productGrid");
   var modal = document.getElementById("productModal");
-  function productImageUrl(path){
-    if(!path) return "";
-    return path.indexOf("assets/")===0 ? path : "https://raw.githubusercontent.com/soyodsimanto320-netizen/GlowAura-Gift/main/" + path;
-  }
   var selectedProduct = null, selectedVariant = "";
   function openProduct(p){
     var card = Array.prototype.find.call(pg.children, function(el){
@@ -689,12 +695,11 @@ var PRODUCTS = [
     }
     selectedProduct = p;
     window.__glowSelectedProduct = p;
-    var firstVariant = (p.variants && p.variants[0]) || "Standard";
-    selectedVariant = typeof firstVariant === "string" ? firstVariant : firstVariant.name;
+    selectedVariant = (p.variants && p.variants[0]) || "Standard";
     document.getElementById("modalProductName").textContent = p.name;
     document.getElementById("modalProductText").textContent = p.text;
     var modalImg = document.getElementById("modalProductImage");
-    modalImg.src = productImageUrl(p.image);
+    modalImg.src = "https://raw.githubusercontent.com/soyodsimanto320-netizen/GlowAura-Gift/main/" + p.image;
     modalImg.alt = p.name;
     document.getElementById("modalProductPrice").innerHTML =
       (p.regularPrice ? '<del>৳ ' + p.regularPrice + '</del>' : '') + '৳ ' + p.price;
@@ -704,20 +709,11 @@ var PRODUCTS = [
       var choice = document.createElement("button");
       choice.type = "button";
       choice.className = "variant-choice" + (idx===0 ? " selected" : "");
-      var variantName = typeof v === "string" ? v : v.name;
-      if(typeof v === "string"){
-        choice.textContent = variantName;
-      } else {
-        var thumb = document.createElement("img");
-        thumb.src = productImageUrl(v.image); thumb.alt = "";
-        var label = document.createElement("span"); label.textContent = variantName;
-        choice.append(thumb,label);
-      }
+      choice.textContent = v;
       choice.addEventListener("click", function(){
-        selectedVariant = variantName;
+        selectedVariant = v;
         list.querySelectorAll(".variant-choice").forEach(function(x){x.classList.remove("selected");});
         choice.classList.add("selected");
-        if(typeof v !== "string" && v.image){ modalImg.src = productImageUrl(v.image); modalImg.alt = p.name + " - " + variantName; }
       });
       list.appendChild(choice);
     });
@@ -761,7 +757,7 @@ var PRODUCTS = [
     d.setAttribute("aria-label","View " + p.name);
 
     var img = document.createElement("img");
-    img.src = productImageUrl(p.image);
+    img.src = "https://raw.githubusercontent.com/soyodsimanto320-netizen/GlowAura-Gift/main/" + p.image;
     img.alt = p.name;
     img.style.width = "100%";
     img.style.height = "190px";
